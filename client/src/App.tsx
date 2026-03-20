@@ -7,13 +7,26 @@ function App() {
   const [answer, setAnswer] = useState("");
 
   const handleAsk = async () => {
+    if(!question.trim()) return;
     setLoading(true);
     setAnswer("");
-    // Simulate an API call
-    setTimeout(() => {
-      setAnswer("This is a simulated answer to your question.");
+    try {
+      console.log("URL", import.meta.env.VITE_API_URL);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ask`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json();
+      setAnswer(data.answer);
+    } catch (error) {
+      console.error("Error while asking:", error);
+      setAnswer("Sorry, something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
