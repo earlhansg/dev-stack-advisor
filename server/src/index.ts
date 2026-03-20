@@ -24,11 +24,23 @@ app.post("/api/ask", async (req, res) => {
             queryStore(VS_PROJECT, question),
             queryStore(VS_CASE, question),
         ]);
-        const final = await openai.responses.create({
+        const prompt = builderPrompt(question, tech, templates, cases);
+        // SET STEAM HEADERS
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Transfer-Encoding', 'chunked');
+
+        const stream = await openai.responses.stream({
             model: "gpt-4.1-mini",
-            input: builderPrompt(question, tech, templates, cases),
+            input: prompt,
         });
-        res.json({ answer: final.output_text || "Sorry, I couldn't find an answer." });
+
+        // STREAM TOKENS
+        for await (const event of stream) {
+            if (event.type === "response.output_text.delta") {
+                res.write(event.delta);
+            }
+        }
+        res.end();
     } catch (error) {
         console.error("Error occurred while processing the request:", error);
         res.status(500).json({ error: "An error occurred while processing the request." });

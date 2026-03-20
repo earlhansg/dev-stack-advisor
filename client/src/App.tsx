@@ -19,8 +19,16 @@ function App() {
         },
         body: JSON.stringify({ question }),
       });
-      const data = await res.json();
-      setAnswer(data.answer);
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+      while (!done) {
+        const { value, done: doneReading } = await reader!.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+        // Append the new chunk to the existing answer
+        setAnswer((prev) => prev + chunkValue);
+      }
     } catch (error) {
       console.error("Error while asking:", error);
       setAnswer("Sorry, something went wrong. Please try again.");
@@ -37,12 +45,9 @@ function App() {
         <button className={`w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={handleAsk} disabled={loading}>
           {loading ? "Thinking ..." : "Ask"}
         </button>
-        {answer && (
-          <div className="mt-4 p-4 bg-gray-100 rounded-md">
-            <h2 className="text-lg font-semibold mb-2">Answer:</h2>
-            <p>{answer}</p>
-          </div>
-        )}
+        <div className="mt-4 p-4 bg-gray-100 rounded-md whitespace-pre-wrap min-h-30">
+          {answer || (loading && <span className="animate-pulse">|</span>)}
+        </div>
       </div>
     </div>
   );
