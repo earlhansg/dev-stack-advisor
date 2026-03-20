@@ -77,12 +77,27 @@ function App() {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">DevStack Advisor</h1>
-          <textarea className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ask about tech stack ..." value={question} onChange={(e) => setQuestion(e.target.value)}></textarea>
-          <button className={`w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={handleAsk} disabled={loading}>
-            {loading ? "Thinking ..." : "Ask"}
-          </button>
+          {selectedHistoryIndex !== null && (
+            <div className="mb-4 p-4 bg-gray-50 rounded-md whitespace-pre-wrap">
+              <p>{displayedQuestion}</p>
+            </div>
+          )}
+          {selectedHistoryIndex === null && (
+            <>
+            <textarea className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ask about tech stack ..." value={question} onChange={(e) => setQuestion(e.target.value)}></textarea>
+            <button className={`w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`} onClick={handleAsk} disabled={loading}>
+              {loading ? "Thinking ..." : "Ask"}
+            </button>
+            </>
+          )}
+          {selectedHistoryIndex !== null && (
+            <button className={`mt-2 w-full bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400`} onClick={() => {setSelectedHistoryIndex(null); setQuestion(""); setAnswer("");}}>
+              + New Question
+            </button>
+          )}
           <div className="mt-4 p-4 bg-gray-100 rounded-md whitespace-pre-wrap min-h-30">
-            {answer || (loading && <span className="animate-pulse">|</span>)}
+            {displayedAnswer ||  (loading && "hmmm ...")}
+            {loading && <span className="animate-pulse">|</span>}
           </div>
         </div>
       </div>
