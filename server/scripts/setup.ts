@@ -14,8 +14,8 @@ const openai = new OpenAI({
 // Map folders to their respective files
 const STORE_CONFIG = [
   {
-    name: "vs_technology_profiles",
-    folder: "./data/store-1-technology-profiles",
+    name: "vs_case_studies",
+    folder: "./data/store-3-case-studies",
   },
 ];
 
